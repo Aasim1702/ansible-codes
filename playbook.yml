@@ -3,54 +3,35 @@
   become: true
   tasks:
      - name: update all packages
+       yum:
+        name: '*'
+        state: latest
+       when: ansible_distribution== 'Amazon'
+ 
+     - name: update all packages
        apt:
         name: '*'
         state: latest
+       when: ansible_distribution== 'ubuntu'
  
      - name: installing nginx
-       apt: name=nginx state=present
- 
-     - name: starting nginx
-       service: name=nginx state=started
- 
-     - name: installing php
        apt:
-        name: php8.3
-        state: present
+         name: ['nginx','php8.3', 'php8.3-fpm', 'mariadb-server']
+         state: present
+       when: ansible_distribution== 'ubuntu'
  
-     - name: installing php-fpm
-       apt:
-        name: php8.3-fpm
-        state: present
+     - name: installing nginx
+       yum:
+         name: ['nginx','php8.3', 'php8.3-fpm', 'mariadb105-server']
+         state: present
+       when: ansible_distribution== 'Amazon'
  
-     - name: starting php8.3-fpm
-       service:
-        name: php8.3-fpm
-        state: started
-        enabled: true
- 
-     - name: installing mysql
-       apt:
-        name: mariadb-server
-        state: present
- 
-     - name: starting mysql
-       service:
-        name: mariadb
-        state: started
-        enabled: true
-
-     - name: restart nginx
+     - name: start nginx
        service:
         name: nginx
-        state: restarted
+        state: started
  
-     - name: restart php
-       service:
-        name: php8.3-fpm
-        state: restarted
- 
-     - name: restart mysql
+     - name: start mysql
        service:
         name: mariadb
-        state: restarted
+        state: started
